@@ -172,6 +172,7 @@ def plot_woe(df_woe, rotation_of_axis_labels=0):
     plt.xticks(rotation = rotation_of_axis_labels)
     plt.grid()
 ```
+### Feature Selection: Categorical Features
 ### Feature Selection: Grade Feature
 ```python
 woe_discreat(X_train, 'grade', y_train)
@@ -184,8 +185,84 @@ Running the codes above will resulting the following output.
 
 Based on the grade's WoE plot, we can see that our bins has created a monotonic trend (ascending), therefore we can confirm that our bins have a general trend.<br>
 
-As for the **Information Value**, it gives us the information about the **Predictive Power** that our feature have. Below table is showing the relation between IV and Predictive power of a variable.
+As for the **Information Value**, it gives us the information about the **Predictive Power** that our feature have. Below table is showing the relation between IV and Predictive power of a variable.<br>
 ![image](https://github.com/FluffyArc/eCommerce_Analysis/assets/40890491/5ce91052-cf2d-4dba-bfb0-141c0902f9c8)<br>
 *image by Anik Chakraborty (medium.com)*
 
 Any variable having IV **lesser than .02** can be **excluded** in our binary logistic regression model. As for our *grade* feature, it generate an IV score of **0.277**. Therefore, we can confirm that the *grade* feature is a **medium predictor**
+
+### Feature Selection: Home_Ownership
+Running the function ```woe_discreat``` and ```plot_woe``` will generate the following output.<br>
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/a5a9c3c1-6580-47a3-8045-6a838ebc0d75)
+
+As we can see, since the **n_obs (number of observations)** for **OTHER, NONE, ANY,** and **OWN** are relatively small compared to the rest, we can merge those categories into a new one called **home_ownership:RENT_OTHER_NONE_ANY**.
+
+```python
+X_train['home_ownership:RENT_OTHER_NONE_ANY'] = sum([
+    X_train['ownership:RENT'], X_train['ownership:OTHER'],
+    X_train['ownership:NONE'], X_train['ownership:ANY']
+])
+```
+
+The Information Value (IV) for **home_ownership** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**
+
+### Feature Selection: Addr_State
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/ddfabae4-c07f-4ac1-b808-7d0f7cbb125c)
+
+As for the **addr_state** feature, since it has 50 different value, extracting some new features like in the previous step also neccessary. By using ```plot_woe(woe_discreat(X_train, 'addr_state',y_train).iloc[8:-2, :])``` command, we can have a clear picture of the **addr_state** plot.<br>
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/3838b504-4e5e-4d26-b9c2-9902f88c02ee)
+
+Once again, the extraction of the new features can be determined based on their **n_obs**. The Information Value (IV) for **addr_state** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**
+
+### Feature Selection: Purpose
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/e641720e-d0ea-44b9-a6d3-0555fdfa0649)
+
+The Information Value (IV) for **purpose** feature is **0.041**, which means this feature is a **weak predictor**.
+
+### Feature Selection: Verification Status and Initial List Status
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/59a18b3e-14e1-4a32-a5da-f688767f3eac)
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/f0d9bf8c-2885-4f18-b278-058c4a9257fe)
+
+The Information Value (IV) for both **verification_status** and **initial_list_status** feature are **0.022** and **0.040** consecutively, which means those features are **weak predictors**.
+
+### Feature Selection: Numerical Features
+Not only the categorical features, we also need to encode the numerical features in order to train our model more accurate. The feature selection method for numerical features is the same like the categorical features. The following **WoE Calculation** is used to calculate the WoE and the IV of the features.
+```python
+def woe_ordered_continuous(X_train, cont_var_name, y_train):
+    df = pd.concat([X_train[cont_var_name], y_train], axis=1)
+    
+    #Calculate the number of observations and the proportion of good values (which is 1)
+    #Since the good_bad feature only range from 0-1, calculate the mean good_bad will gives us the same result of the proportion of the good values (1)
+    n_obs = df.groupby(cont_var_name, as_index = False).agg(n_obs = (cont_var_name, 'count'))
+    prop_good = df.groupby(cont_var_name, as_index = False).agg(prop_good = (y_train.name,'mean'))
+    
+    df = pd.concat([n_obs, prop_good], axis=1)
+    
+    #Removing the duplicate feature (only return feature from index 0,1,and 3)
+    df = df.iloc[:,[0,1,3]]
+    
+    #calculate the percentage of observations
+    df['prop_n_obs'] = df['n_obs']/df['n_obs'].sum()
+    
+    #calculate the n_good and the n_bad using the following formula
+    df['n_good'] = df['prop_good'] * df['n_obs']
+    df['n_bad'] = (1-df['prop_good']) * df['n_obs']
+    
+    #calculate the percentage of the n_good and the n_bad
+    df['prcnt_good'] = df['n_good']/df['n_good'].sum()
+    df['prcnt_bad'] = df['n_bad']/df['n_bad'].sum()
+    
+    #calculate the WoE Score
+    df['woe'] = np.log(df['prcnt_good'] / df['prcnt_bad'])
+    
+    #calculate Information Value (IV)
+    df['IV'] = (df['prcnt_good'] - df['prcnt_bad'])*df['woe']
+    df['IV'] = df['IV'].sum()
+    
+    #calculate the difference of good loan and the woe
+    df['diff_prop_good'] = df['prop_good'].diff().abs()
+    df['diff_woe'] = df['woe'].diff().abs()
+    
+    return df
+```
+
