@@ -266,3 +266,60 @@ def woe_ordered_continuous(X_train, cont_var_name, y_train):
     return df
 ```
 
+### Feature Selection: Term
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/6d1d96e4-6dd2-4afd-8db8-87ab86336a1e)
+
+The Information Value (IV) for **term_int** feature is **0.034**, which means this features is a **weak predictors**
+
+### Feature Selection: Employment Length
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/0f9cd13d-2a98-4677-83e1-5fdf96bdf61d)
+
+The Information Value (IV) for **emp_length_int** feature is **0.007**, which means this features is **not useful** and we can exclude this feature as our predictor.
+
+### Feature Selection: Months Since Issue Date
+The **mths_since_issue_date** feature returning a value with vary categories. Therefore, we need to extract a new category that could cover all the values. ```pd.cut()``` can generate the desired categories based on the limit setting. <br>
+```python
+#We tried to divide the value into 50 different category
+pd.cut(X_train['mths_since_issue_date'], 50)
+```
+Once again, the extraction of the new features can be determined based on their **n_obs**.<br>
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/cf6bfec3-f1e7-40bf-ab40-da794954a2c5)
+
+The Information Value (IV) for **mths_since_issue_date** feature is **0.016**, which means this features is a **weak predictor**.
+
+### Feature Selection: Int Rate
+Similar to the previous feature, since **int_rate** returned a vary values, we need to extract a new category from it by using ```pd.cut```.<br>
+
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/32f60402-8603-46f2-87f8-aa373bea24f6)
+
+The Information Value (IV) for **int_rate** feature is **0.345**, which means this features is a **strong predictor**.
+
+### Feature Selection: Funded Amount
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/2d83bd17-ba45-4b06-b88f-66be83364931)
+
+The Information Value (IV) for **funded_amnt** feature is **0.014**, which means this features is **not useful** and we can exclude this feature as our predictor.
+
+### Feature Selection: Months Since Earliest Credit Line
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/f742bc29-6a88-409f-9149-94626509bc34)
+
+The Information Value (IV) for **mths_since_earliest_cr_line** feature is **0.016**, which means this features is **not useful** and we can exclude this feature as our predictor.
+
+### Feature Selection: Installment
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/9f4d21c4-edc7-436c-b431-758467b0c2b0)
+
+The Information Value (IV) for **installment** feature is **0.013**, which means this features is **not useful** and we can exclude this feature as our predictor.
+
+### Feature Selection: Delinquent for 2 Years
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/1f1b6940-df4e-40b6-80ca-04c6e88d058a)
+
+The Information Value (IV) for **delinq_2yrs** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**.
+
+### Feature Selection: Inqueries in Last 6 Months
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/9747a488-fc7b-43a6-bfcf-4cf17d3dd448)
+
+The Information Value (IV) for **inq_last_6mths** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**.
+
+### Feature Selection: Open Account
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/39ce4986-f1f5-4d5c-ac14-d615fc8f52a1)
+
+The Information Value (IV) for **open_acc** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**.
