@@ -84,8 +84,6 @@ The same goes with the date-time feautures.
 
 # Stage 3: Modeling
 ---
->**_NOTE:_** To calculate the **Expected Loss**, the following formula is applied.<br>
-> **EL = PD x LGD x EAD** <br>
 
 ## Probability of Default (PD)
 ### Splitting Data
@@ -323,3 +321,46 @@ The Information Value (IV) for **inq_last_6mths** feature is **inf(infinity)**, 
 ![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/39ce4986-f1f5-4d5c-ac14-d615fc8f52a1)
 
 The Information Value (IV) for **open_acc** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**.
+
+### Feature Selection: Public Record
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/6b272845-ff31-4d36-9620-8e8b39c853d7)
+The Information Value (IV) for **pub_rec** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**.
+
+### Feature Selection: Account Now Delinquent
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/e2b6d5d7-4d1c-4b2b-8688-e8fe50437f78)
+The Information Value (IV) for **acc_now_delinq** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**.
+
+### Feature Selection: Annual Income
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/9fe21ade-8dac-486d-a598-29d16d37e937)
+The Information Value (IV) for **annual_inc** feature is **0.05365**, which means this features is a **weak predictor**.
+
+### Feature Selection: Months Since Last Delinquent
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/e15a32d2-4c64-4382-a61a-d82136161626)
+The Information Value (IV) for **mths_since_last_delinq** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**.
+
+### Feature Selection: DTI
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/f562fe16-15b3-4c92-b82f-f671ab045394)
+The Information Value (IV) for **dti** feature is **0.023004**, which means this feature is a **weak predictor**.
+
+### Feature Selection: Months Since Last Record
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/4d2aaf6d-5be7-407c-aac8-02ac5341f6f4)
+The Information Value (IV) for **mths_since_last_record** feature is **0.010336**, which means this features is **not useful** and we can exclude this feature as our predictor.
+
+## Feature Extraction: Numerical Features.
+To create a more readable feature, a new group of selected numerical features will be extracted from the existing features. The new group will be created based on the **num_obs** by using the ```plot_woe()``` function.
+
+# Model Fitting
+**Logistic Regression** is one of the simplest models that can be used to predict the Probability of Default. 
+
+# Model Evaluation
+## ROC_AUC Curve
+By using the ROC Curve, we can identify how good our model's performance is.
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/518511f1-206c-4a07-b1ac-a0a0b924fb96)
+
+By calculating the auc_roc from the real data test and the predicted probability, we get the score of **0.683**. A binary classifier is **useful only** when it achieves ROC-AUC score **greater than 0.5 and as near to 1 as possible**. If a classifier yields a score **less than 0.5**, it simply means that the **model is performing worse** than a random classifier, and hence, is of no use.
+
+## Gini Coefficient
+The Gini coefficient is a metric that indicates the model’s discriminatory power, namely, the effectiveness of the model in differentiating between **bad** borrowers, who will default in the future, and **good** borrowers, who won’t default in the future.<br>
+
+Gini score can be calculated with the following formula:<br>
+```gini = auc_roc*2-1```. The model get **0.3672** for the Gini Coefficient score. Even though it's still far from the perfect model, our trained model has the power to distinguish the good and bad borrower.
