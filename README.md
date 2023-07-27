@@ -50,13 +50,11 @@
 # Stage 0: Problem Statement
 ---
 ## Overview
-Determining the creditworthiness of a customer is crucial before lending a loan to avoid the high number of possible default customers. In order to assess the credit risk, we need to calculate three following metrics:
+Determining the creditworthiness of a customer is crucial before lending a loan to avoid the high number of possible default customers. In order to assess the credit risk, we need to calculate the following metrics:
 1. **Probability of Default**: is the likelihood that a borrower will fail to pay back a certain debt.
-2. **Loss Given Default**: is the amount of money a financial institution loses when a borrower defaults on a loan, after taking into consideration any recovery, represented as a percentage of total exposure at the time of loss.
-3. **Exposure at Default**: is the predicted amount of loss a bank may be exposed to when a debtor defaults on a loan.
 
 ## Objective
-Develop a model to predict the **Expected Loss** by calculating the three main metrics mentioned above.
+Develop a model to predict the **Probability of Default** based on the Weight of Evidence and Information Value Score.
 
 # Stage 1: Exploratory Data Analysis
 ---
