@@ -2,6 +2,51 @@
 
 ### Table of Contents:
 
+- [**Stage 0: Problem Statement**](#stage-0-problem-statement)
+    - [Overview](#overview)
+    - [Objective](#objective)
+- [**Stage 1: Exploratory Data Analysis**](#stage-1-exploratory-data-analysis)
+    - [Checking Data Types](#checking-data-types)
+- [**Stage 2: Data Preprocessing**](#stage-2-data-preprocessing)
+    - [General Preprocessing](#general-preprocessing)
+    - [Handling Missing Value](#handling-missing-value)
+    - [Feature Extraction](#feature-extraction)
+- [**Stage 3: Modeling**](#stage-3-modeling)
+    - [Probability of Default](#probability-of-default-pd)
+        - [Feature Selection - Weight of Evidence and Information Value](#feature-selection---weight-of-evidence-and-information-value)
+    - [Feature Selection: Categorical Features](#feature-selection-categorical-features)
+        - [Feature Selection: Grade](#feature-selection-grade-feature)
+        - [Feature Selection: Home Ownership](#feature-selection-home-ownership)
+        - [Feature Selection: Addr State](#feature-selection-addr-state)
+        - [Feature Selection: Purpose](#feature-selection-purpose)
+        - [Feature Selection: Verification Status and Initial List Status](#feature-selection-verification-status-and-initial-list-status)
+    - [Feature Selection: Numerical Features](#feature-selection-numerical-features)
+        - [Feature Selection: Term](#feature-selection-term)
+        - [Feature Selection: Employment Length](#feature-selection-employment-length)
+        - [Feature Selection: Months Since Issue Date](#feature-selection-months-since-issue-date)
+        - [Feature Selection: Int Rate](#feature-selection-int-rate)
+        - [Feature Selection: Funded Amount](#feature-selection-funded-amount)
+        - [Feature Selection: Months Since Earliest Credit Line](#feature-selection-months-since-earliest-credit-line)
+        - [Feature Selection: Installment](#feature-selection-installment)
+        - [Feature Selection: Delinquent for 2 Years](#feature-selection-delinquent-for-2-years)
+        - [Feature Selection: Inqueries in Last 6 Months](#feature-selection-inqueries-in-last-6-months)
+        - [Feature Selection: Open Account](#feature-selection-open-account)
+        - [Feature Selection: Public Record](#feature-selection-public-record)
+        - [Feature Selection: Account Now Delinquent](#feature-selection-account-now-delinquent)
+        - [Feature Selection: Annual Income](#feature-selection-annual-income)
+        - [Feature Selection: Months Since Last Delinquent](#feature-selection-months-since-last-delinquent)
+        - [Feature Selection: DTI](#feature-selection-dti)
+        - [Feature Selection: Months Since Last Record](#feature-selection-months-since-last-record)
+    - [Feature Extraction: Numerical Features](#feature-extraction-numerical-features)
+- [**Stage 4: Model Fitting**](#model-fitting)
+- [**Stage 5: Model Evaluation**](#model-evaluation)
+    - [ROC_AUC Curve](#roc_auc-curve)
+    - [Gini Coefficient](#gini-coefficient)
+- [**Stage 6: Creating Scorecard**](#creating-scorecard)
+    - [Convert Scorecard into Probability of Default](#convert-scorecard-into-probability-of-default)
+- [**Stage 7: Setup Cut-off, Approval, and Rejected Rate**](#setup-cutt-off-approval-and-rejected-rate)
+
+
 # Stage 0: Problem Statement
 ---
 ## Overview
@@ -170,8 +215,8 @@ def plot_woe(df_woe, rotation_of_axis_labels=0):
     plt.xticks(rotation = rotation_of_axis_labels)
     plt.grid()
 ```
-### Feature Selection: Categorical Features
-### Feature Selection: Grade Feature
+## Feature Selection: Categorical Features
+### Feature Selection: Grade
 ```python
 woe_discreat(X_train, 'grade', y_train)
 plot_woe((woe_discreat(X_train, 'grade', y_train)))
@@ -189,7 +234,7 @@ As for the **Information Value**, it gives us the information about the **Predic
 
 Any variable having IV **lesser than .02** can be **excluded** in our binary logistic regression model. As for our *grade* feature, it generate an IV score of **0.277**. Therefore, we can confirm that the *grade* feature is a **medium predictor**
 
-### Feature Selection: Home_Ownership
+### Feature Selection: Home Ownership
 Running the function ```woe_discreat``` and ```plot_woe``` will generate the following output.<br>
 ![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/a5a9c3c1-6580-47a3-8045-6a838ebc0d75)
 
@@ -204,7 +249,7 @@ X_train['home_ownership:RENT_OTHER_NONE_ANY'] = sum([
 
 The Information Value (IV) for **home_ownership** feature is **inf(infinity)**, which means this feature an **extremely powerful predictor**
 
-### Feature Selection: Addr_State
+### Feature Selection: Addr State
 ![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/ddfabae4-c07f-4ac1-b808-7d0f7cbb125c)
 
 As for the **addr_state** feature, since it has 50 different value, extracting some new features like in the previous step also neccessary. By using ```plot_woe(woe_discreat(X_train, 'addr_state',y_train).iloc[8:-2, :])``` command, we can have a clear picture of the **addr_state** plot.<br>
@@ -223,7 +268,7 @@ The Information Value (IV) for **purpose** feature is **0.041**, which means thi
 
 The Information Value (IV) for both **verification_status** and **initial_list_status** feature are **0.022** and **0.040** consecutively, which means those features are **weak predictors**.
 
-### Feature Selection: Numerical Features
+## Feature Selection: Numerical Features
 Not only the categorical features, we also need to encode the numerical features in order to train our model more accurate. The feature selection method for numerical features is the same like the categorical features. The following **WoE Calculation** is used to calculate the WoE and the IV of the features.
 ```python
 def woe_ordered_continuous(X_train, cont_var_name, y_train):
@@ -363,4 +408,39 @@ By calculating the auc_roc from the real data test and the predicted probability
 The Gini coefficient is a metric that indicates the model’s discriminatory power, namely, the effectiveness of the model in differentiating between **bad** borrowers, who will default in the future, and **good** borrowers, who won’t default in the future.<br>
 
 Gini score can be calculated with the following formula:<br>
-```gini = auc_roc*2-1```. The model get **0.3672** for the Gini Coefficient score. Even though it's still far from the perfect model, our trained model has the power to distinguish the good and bad borrower.
+```gini = auc_roc*2-1```. The model get **0.3672** for the Gini Coefficient score. Even though it's still far from the perfect model, our trained model has the power to distinguish between the good and bad borrower.
+
+# Creating Scorecard
+Application scorecards are used alongside this to evaluate the risk of a proposal during the credit approval process for reaching a “approve/don’t approve/refer to higher authority” decision. Most of the banks usually use **300** as the minimum score where a borrower falls into the **worst** categories for all variables, and **800** as the maximum score where a borrower falls into the **best** categories for all variables. The following formula is used to calculate the Scorecard.
+> **_Scorecard=_** *variable_coef x ((max_score - min_score) / (max_sum_coef - min_sum(coef)))*
+
+# Convert Scorecard into Probability of Default
+To convert the credit score back to the Probability of Default score, the following formula is used:
+> **_Sum of Coef from Score=_** *((total_score - min_score) / (max_score - min_score)) x (max_sum_coef - min_sum_coef) + min_sum_coef*
+
+After we retrieve the **Sum of Coef from Score**, we can convert the probability by calculate the exponential of the Sum_Coef_Score.
+```python
+y_hat_proba_from_score = np.exp(sum_of_coef_from_score) / (np.exp(sum_of_coef_from_score) + 1)
+```
+
+# Setup Cutt-off, Approval, and Rejected Rate
+Cut-off rate is usually used for taking a decision whether to approve a loan application or not. The cut-off rate is used from the **threshold** generated from the **roc_curve**
+
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/2a68d9b1-40e4-4f58-9f95-32cdcf3da551)
+
+The **Approval** and **Rejected** Rate are calculated with the following code:
+```python
+cutoffs['N Approved'] = cutoffs['threshold'].apply(n_approved)
+cutoffs['N Rejected'] = data_actual_predicted_proba['y_hat_test_proba'].shape[0] - cutoffs['N Approved']
+
+cutoffs['Approval Rate'] = cutoffs['N Approved'] / data_actual_predicted_proba['y_hat_test_proba'].shape[0]
+cutoffs['Rejected Rate'] = 1 - cutoffs['Approval Rate']
+```
+
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/1085379d-c7d2-41bc-b0d8-5534753ccaab)
+
+As an example, if we take a threshold of 97%, we predict that only **2%** applications will be approved, and **97%** will be rejected. This can give us a **Good Quality** loan, but **Low Quantity** loan.
+
+![image](https://github.com/FluffyArc/CreditRisk/assets/40890491/bb7499a2-27c4-4ca2-9dba-09aebb735c0a)
+
+On the other hand, if we used lower threshold like 56%, we can have **99%** approval rate and less than **1%** rejected rate, which will bring us **Good Quantity** loan and **Low Quality** loan.
